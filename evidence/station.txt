@@ -1,0 +1,15 @@
+Station number: D22109; Pi model: Raspberry Pi 5; Boot-drive label: 21; Name: Mehdi Lammissi
+
+1. In sam.add(431), what is self inside the method, and who passed it ?
+self is the specific ReactionLog instance being operated on in memory and python passed it.
+2. Write the class header and __init__ for a Fan that needs a pin starts stopped.
+class Fan:
+    def __init__(self,pin):
+        self.pin = pin
+        self.is_running = False
+3. Attribute or method: button.is_pressed, led.blink(0.2, 0.2), game.log? One word each.
+button.is_pressed = Attribute; led.blink(0.2, 0.2) = Method; game.log = Attribute
+4. Week 5's false_start flag no longer exists. what replaced it, and why ?
+A method return value replaced it.
+5. Your NightLight shows mode NORMAL with the LED on. In one sentence, what design rule was broken?
+Encapsulation was broken because the LED and mode states drifted.
