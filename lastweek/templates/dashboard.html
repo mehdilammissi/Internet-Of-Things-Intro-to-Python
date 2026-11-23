@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Station {{ station }}</title>
+<style>
+  body   { font-family: system-ui, sans-serif; background: #f3f5f0; color: #16211b; margin: 0; padding: 1rem; }
+  .card  { max-width: 30rem; margin: 0 auto; background: #fff; border: 2px solid #16211b; border-radius: 14px; padding: 1.1rem 1.3rem; }
+  h1     { margin: 0 0 .4rem; font-size: 1.35rem; }
+  #status { float: right; padding: .15rem .8rem; border-radius: 99px; font-weight: 700; background: #e5e5e5; }
+  #status.online  { background: #e3f1e8; color: #14532f; }
+  #status.offline { background: #fbe7ec; color: #c41e4a; }
+  #pct   { font: 700 3.4rem ui-monospace, monospace; }
+  small  { color: #5a675f; }
+  svg    { display: block; width: 100%; height: 130px; background: #f3f5f0; border-radius: 8px; }
+  input  { width: 5rem; font-size: 1.1rem; padding: .3rem; }
+  button { font-size: 1.1rem; padding: .35rem 1.1rem; background: #1e7a4c; color: #fff; border: 0; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <span id="status">...</span>
+  <h1>Station {{ station }}</h1>
+  <p><span id="pct">--</span> %<br>
+     <small>light level, updated <span id="updated">--</span></small></p>
+
+  <svg viewBox="0 0 300 100" preserveAspectRatio="none">
+    <line id="target" x1="0" x2="300" y1="-10" y2="-10" stroke="#b9772e" stroke-width="2" stroke-dasharray="6 4"/>
+    <polyline id="trace" points="" fill="none" stroke="#1e7a4c" stroke-width="2.5"/>
+  </svg>
+  <small>last 60 readings (green) and the target (dashed)</small>
+
+  <p>Target: <input id="sp" type="number" value="70" min="0" max="100"> %
+     <button onclick="sendSP()">Set</button> <small id="msg"></small></p>
+</div>
+
+<script>
+const points = [];                               // the last 60 readings
+
+async function refresh() {
+  try {
+    const r = await fetch("/api/light");         // GET: ask the Pi
+    const d = await r.json();                    // its JSON answer
+    document.getElementById("status").textContent = d.status;
+    document.getElementById("status").className = d.status;
+    document.getElementById("updated").textContent = d.updated || "--";
+    if (d.pct !== null) {
+      document.getElementById("pct").textContent = d.pct.toFixed(1);
+      points.push(d.pct);
+      if (points.length > 60) points.shift();
+      document.getElementById("trace").setAttribute("points",
+        points.map((p, i) => (i * 5) + "," + (100 - p)).join(" "));
+    }
+    if (d.sp !== null) {
+      document.getElementById("target").setAttribute("y1", 100 - d.sp);
+      document.getElementById("target").setAttribute("y2", 100 - d.sp);
+    }
+  } catch (e) {
+    document.getElementById("status").textContent = "no server";
+    document.getElementById("status").className = "offline";
+  }
+}
+
+async function sendSP() {
+  const sp = document.getElementById("sp").value;
+  const r = await fetch("/api/setpoint", {       // POST: this one acts
+    method: "POST",
+    body: new URLSearchParams({sp: sp})
+  });
+  const d = await r.json();
+  document.getElementById("msg").textContent = d.ok ? "sent: " + d.sp + " %" : d.error;
+}
+
+setInterval(refresh, 2000);                      // ask again every 2 s
+refresh();
+</script>
+</body>
+</html>

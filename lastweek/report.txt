@@ -1,0 +1,31 @@
+LAST WEEK REPORT 2026-11-23 15:22 raspberrypi
+Names: ALEXANDER MACLEAN, MEHDI LAMMISSI
+R1 flask 3.1.3 | paho-mqtt 2.2.0
+R2 GET /     -> 200
+R3 GET /nope -> 404
+R4 network address, before -> 000
+R7 /          is 
+R8 /api/light is 
+R7 /          is text/html; charset=utf-8
+R8 /api/light is application/json
+R9 {"pct":49.8,"station":"s01","status":"online","updated":"15:39:18"}
+R9 {"pct":49.4,"station":"s01","status":"online","updated":"15:39:21"}
+R10 node stopped: {"pct":50.4,"station":"s01","status":"online","updated":"15:39:25"}
+R11 {"ok":true,"sp":30.0}
+R12 GET /api/setpoint -> 405
+Last Week check 2026-11-23 15:41:21 host raspberrypi
+ 1 PASS  page answers on localhost                  200 text/html
+ 2 PASS  page answers on 192.168.50.129             200
+ 3 PASS  /api/light answers with JSON               200 application/json
+ 4 PASS  unknown path /nope is refused              404
+ 5 PASS  readings are live (two reads, 3 s apart)   30.2 -> 29.8  status online
+ 6 PASS  GET /api/setpoint is refused               405
+ 7 PASS  POST sp=70 reaches bench/s01/cmd           200 heard ['sp:70']
+ 8 PASS  reading follows the setpoint (29.8 -> 70)  within 3 points after 7 s
+RESULT 8/8  station s01  host raspberrypi  2026-11-23 15:41
+W1 One Set press, hop by hop, from browser back to browser:
+
+W2 Why does the dict "latest" exist? One sentence:
+
+W3 How old can the number on the page be, in seconds, and why:
+
